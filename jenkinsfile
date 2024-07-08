@@ -1,0 +1,55 @@
+pipeline {
+    agent any
+    environment {
+        // Define environment variables
+        GIT_REPO = 'https://github.com/ahussain119/simple-webapp.git'
+        BRANCH = 'main'
+        DOCKER_IMAGE = '<username>/simple-webapp'
+        DOCKER_REGISTRY = 'docker.io' // Updated to the correct Docker registry URL
+        REGISTRY_CREDENTIALS_ID = 'docker' // Ensure this is the correct credentials ID
+    }
+    stages {
+        stage('Checkout') {
+            agent {
+                label 'docker' // Ensure this label matches your build server's label
+            }
+            steps {
+                // Checkout the code from the specified Git repository and branch
+                git branch: "${BRANCH}", url: "${GIT_REPO}"
+            }
+        }
+        stage('Build Docker Image') {
+            agent {
+                label 'docker' // Ensure this label matches your build server's label
+            }
+            steps {
+                script {
+                    withCredentials([usernamePassword(credentialsId: env.REGISTRY_CREDENTIALS_ID, usernameVariable: 'USERNAME', passwordVariable: 'PASSWORD')]) {
+                        sh """
+                        echo \${PASSWORD} | docker login -u \${USERNAME} --password-stdin
+                        docker build -t \${DOCKER_IMAGE} .
+                        docker tag \${DOCKER_IMAGE} \${DOCKER_REGISTRY}/\${DOCKER_IMAGE}:latest
+                        docker push \${DOCKER_REGISTRY}/\${DOCKER_IMAGE}:latest
+                        """
+                    }
+                }
+            }
+        }
+        stage('Deploy to Kubernetes') {
+            agent {
+                label 'k8s' // Ensure this label matches your Kubernetes deployment server's label
+            }
+            steps {
+                unstash 'deployment'
+                script {
+                    withCredentials([file(credentialsId: 'kubeconfig', variable: 'KUBECONFIG_FILE')]) {
+                        sh """
+                        export KUBECONFIG=\${KUBECONFIG_FILE}
+                        kubectl apply -f deployment.yaml
+                        """
+                    }
+                }
+            }
+        }
+    }
+}
