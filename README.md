@@ -45,10 +45,12 @@ sudo apt-get install jenkins
 ```
 sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 ```
+![Default admin password](./Photos/1.png)
 
 6. Install the suggested plugins to enhance the functionality of Jenkins.
 
 7. Finally, create an admin user to manage Jenkins.
+![Dashboard](./Photos/2.png)
 
 ## Docker Setup on EC2 and configuring on Jenkins
 To set up Docker on the EC2 instance and configure it in Jenkins, follow these steps:
@@ -102,6 +104,7 @@ To set up Docker on the EC2 instance and configure it in Jenkins, follow these s
     - Set the ID as "ssh-key".
     - Set the username as "ubuntu".
     - Select "Enter directly" and paste the SSH key.
+    ![SSH-Credentials](./Photos/3.png)
     - Save the credentials.
 
 10. Again, go to "Manage Jenkins" -> "Nodes" -> "New Node".
@@ -162,6 +165,7 @@ To set up Kubernetes, follow these steps:
     - Uncomment or add the line `net.ipv4.ip_forward=1` (remove any preceding #).
     - Save the file.
     - Run `sudo sysctl -p` to apply the changes.
+    ![Forwarding enable](./Photos/4.png)
 
 7. Start the control plane node by running the following command:
     ```
@@ -207,6 +211,7 @@ To set up Kubernetes, follow these steps:
      - Copy the contents and save it on your local machine.
      - Go to the Jenkins portal.
      - Navigate to "Manage Jenkins" -> "Credentials" -> "Global (domain)" -> "Add credentials".
+     ![config-secret](./Photos/6.png)
      - Select "Secret file" as the kind.
      - Upload the file and give it an ID of "kubefile".
      - Save the credentials.
@@ -260,12 +265,14 @@ To set up Kubernetes, follow these steps:
 7. Use the kubeadm join command that you got on the control plane when initiating the cluster.
 
 8. On the control plane node, run 'kubectl get nodes'.
+![Nodes](./Photos/5.png)
 
 ## Pipeline Setup
 Before adding credentials for Dockerhub on Jenkins, follow these steps:
 
 1. On the Jenkins dashboard, navigate to "Manage Jenkins" -> "Credentials" -> "System" -> "Global credentials" -> "Add credentials".
 2. Add your Dockerhub username and password to the credentials.
+![Docker-credential](./Photos/7.png)
 
 Now, on the Jenkins dashboard, follow these steps:
 
@@ -274,6 +281,9 @@ Now, on the Jenkins dashboard, follow these steps:
 3. Select "Pipeline".
 4. Copy and paste the pipeline script.
 5. Save the configuration.
+![Pipeline](./Photos/8.png)
 
 Finally, build the pipeline. The application will be built and deployed on the Kubernetes slave and can be accessed at www.URL:30080. You can check the status of pods on the control plane using "kubectl get pods".
+
+![website](./Photos/9.png)
 
