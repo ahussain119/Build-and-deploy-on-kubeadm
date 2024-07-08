@@ -211,7 +211,7 @@ To set up Kubernetes, follow these steps:
      - Upload the file and give it an ID of "kubefile".
      - Save the credentials.
 
-# Kubernetes slave Setup on EC2 and configuring on Jenkins
+## Kubernetes slave Setup on EC2 and configuring on Jenkins
 To set up Kubernetes, follow these steps:
 
 1. SSH into the Kubernetes cluster from Jenkins.
