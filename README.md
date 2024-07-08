@@ -1,22 +1,24 @@
 # Build and deploy containerized web app via jenkins pipeline to kubeadm
-Today, we are building web java app conatiner using docker, then deploying it to k8s cluster. Jenkins pipeline is being used to automate the entire process.
+Today, we are building a web Java app container using Docker and deploying it to a Kubernetes cluster. We are using Jenkins pipeline to automate the entire process.
 
-### Prerecuries
-1. AWS account with some credits 
-2. Already created a ssh key on AWS account, and downloaded private part of it.
-3. Domain name and hosted zones created
+### Prerequisites
+1. AWS account with some credits.
+2. Already created an SSH key on the AWS account and downloaded the private part of it.
+3. Domain name and hosted zones created.
 
-## Provisioning infrastructure using terraform.
+## Provisioning infrastructure using Terraform
+Before running the main Terraform to provision, run the main folder from 'LockNremote' to get a remote bucket and DynamoDB to store data remotely and lock the Terraform state while the infrastructure is being configured.
 
-1. Download terraform configureation from github. 
-2. Edit the variable, like key name, domain name, etc.
-3. Run 'terraform init'
-4. terraform validate
-5. terraform plan
-6. terrafrom apply
-7. You must have four EC2's, two in public subnet and two private subnet.
+1. Download the Terraform configuration from GitHub.
+2. Edit the variables, such as key name, domain name, etc.
+3. Run 'terraform init'.
+4. Run 'terraform validate'.
+5. Run 'terraform plan'.
+6. Run 'terraform apply'.
+7. You should have four EC2 instances, two in the public subnet and two in the private subnet.
 
-## To set up Jenkins on your system, please follow these steps:
+## Setting up Jenkins on your system
+To set up Jenkins on your system, please follow these steps:
 
 1. Download and install Java 11 by running the following commands:
 ```
@@ -24,7 +26,7 @@ sudo apt update
 sudo apt install openjdk-11-jdk
 ```
 
-2. Next, download Jenkins from the official website. Follow the instructions provided on the website, current commands are added below. Run the following commands to add the Jenkins repository key and update your package list:
+2. Next, download Jenkins from the official website. Follow the instructions provided on the website. The current commands are added below. Run the following commands to add the Jenkins repository key and update your package list:
 ```
 sudo wget -O /usr/share/keyrings/jenkins-keyring.asc \
     https://pkg.jenkins.io/debian-stable/jenkins.io-2023.key
@@ -48,13 +50,12 @@ sudo cat /var/lib/jenkins/secrets/initialAdminPassword
 
 7. Finally, create an admin user to manage Jenkins.
 
-## Docker Setup on EC2 and configuring on jenkins
-
+## Docker Setup on EC2 and configuring on Jenkins
 To set up Docker on the EC2 instance and configure it in Jenkins, follow these steps:
 
-1. SSH into the Jenkins EC2 server, use it as a jump server.
+1. SSH into the Jenkins EC2 server and use it as a jump server.
 
-2. Copy the SSH key and create an SSH key in Jenkins. Make sure to change the permissions for the key file using the following command, then ssh to docker's EC2:
+2. Copy the SSH key and create an SSH key in Jenkins. Make sure to change the permissions for the key file using the following command, then SSH to the Docker's EC2:
     ```
     chmod 400 key-name
     ```
@@ -116,8 +117,7 @@ To set up Docker on the EC2 instance and configure it in Jenkins, follow these s
 
 11. In the "Nodes" section, select the "docker" node and check the logs to ensure that the agent successfully connects and goes online.
 
-## Kubernetes Setup on EC2 and configuring on jenkins
-
+## Kubernetes Setup on EC2 and configuring on Jenkins
 To set up Kubernetes, follow these steps:
 
 1. SSH into the Jenkins EC2 server using the same key file to SSH into the Kubernetes EC2 from Jenkins.
@@ -167,7 +167,8 @@ To set up Kubernetes, follow these steps:
     ```
     sudo kubeadm init
     ```
-    Note: keep the note of join command. 
+    Note: Keep note of the join command.
+
 8. Set up the local kubeconfig by running the following commands:
     ```
     mkdir -p $HOME/.kube
@@ -210,8 +211,7 @@ To set up Kubernetes, follow these steps:
      - Upload the file and give it an ID of "kubefile".
      - Save the credentials.
 
-# Kubernetes slave Setup on EC2 and configuring on jenkins
-
+# Kubernetes slave Setup on EC2 and configuring on Jenkins
 To set up Kubernetes, follow these steps:
 
 1. SSH into the Kubernetes cluster from Jenkins.
@@ -231,6 +231,7 @@ To set up Kubernetes, follow these steps:
     systemctl start docker
     systemctl enable docker
     ```
+
 4. Download and install `kubeadm`, `kubelet`, `kubectl`, and `kubernetes-cni`. If the commands are not working, use the official website for installation instructions:
     ```
     sudo apt-get update
@@ -256,12 +257,11 @@ To set up Kubernetes, follow these steps:
     - Save the file.
     - Run `sudo sysctl -p` to apply the changes.
 
-7. Use kubeadm join command that you got on the control plane when initiated the cluster.
+7. Use the kubeadm join command that you got on the control plane when initiating the cluster.
 
-8. On the control plane node, run 'kubectl get nodes'. 
+8. On the control plane node, run 'kubectl get nodes'.
 
 ## Pipeline Setup
-
 Before adding credentials for Dockerhub on Jenkins, follow these steps:
 
 1. On the Jenkins dashboard, navigate to "Manage Jenkins" -> "Credentials" -> "System" -> "Global credentials" -> "Add credentials".
@@ -275,7 +275,5 @@ Now, on the Jenkins dashboard, follow these steps:
 4. Copy and paste the pipeline script.
 5. Save the configuration.
 
-Finally, build the pipeline. The application will be built and deployed on the Kubernetes slave and can be accessed at www.URL:30080
-You can check status of pods on control plane "kubectl get pods"
-
+Finally, build the pipeline. The application will be built and deployed on the Kubernetes slave and can be accessed at www.URL:30080. You can check the status of pods on the control plane using "kubectl get pods".
 
